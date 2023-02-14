@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>shaders/diagram.fsh</file>
+        <file>shaders/diagram.vsh</file>
+        <file>img/icon.png</file>
+    </qresource>
+</RCC>
