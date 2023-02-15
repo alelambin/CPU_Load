@@ -1,14 +1,15 @@
 #version 330 core
 
-attribute float aValue;
+in float aValue;
 
-varying float vHeight;
+out float vHeight;
 
-uniform int uMeasuringCount;
+uniform int uStartIndex;
+uniform int uVertexCount;
 
 void main() {
-    float height = aValue * 2.0 - 1.0;
-    vHeight = height;
-    float x = 2.0 / uMeasuringCount * gl_VertexID - 1.0;
-    gl_Position = vec4(x, height, 0.0, 1.0);
+    vHeight = aValue * 2.0 - 1.0;
+    int index = (gl_VertexID - uStartIndex + uVertexCount) % uVertexCount;
+    float x = 2.0 / (uVertexCount - 1) * index - 1.0;
+    gl_Position = vec4(x, vHeight, 0.0, 1.0);
 }

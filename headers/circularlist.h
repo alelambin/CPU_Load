@@ -2,80 +2,64 @@
 #define CIRCULARLIST_H
 
 #include <stdexcept>
-#include "listnode.h"
 
 template<typename T>
 class CircularList {
 public:
-    CircularList(unsigned int size) : size(size) {
+    CircularList(unsigned int size, T initData) : size(size) {
         if (size == 0) {
             throw std::invalid_argument("Error: invalid list size");
         }
 
-        head = new ListNode<T>();
-        ListNode<T> *prevNode = head;
-        ListNode<T> *curNode = nullptr;
-        for (int i = 1; i < size; ++i) {
-            curNode = new ListNode<T>();
-            prevNode->setNext(curNode);
-            prevNode = curNode;
+        data = new T[size + 1];
+        for (int i = 0; i < size + 1; ++i) {
+            data[i] = initData;
         }
-        tail = curNode;
-        tail->setNext(head);
+        headIndex = 0;
+        tailIndex = size - 1;
     }
 
     ~CircularList() {
-        ListNode<T> *prevNode = head;
-        ListNode<T> *curNode = head;
-        while (curNode != tail) {
-            curNode = curNode->getNext();
-            delete prevNode;
-            prevNode = curNode;
-        }
-        delete curNode;
+        delete [] data;
     }
 
-    void append(T data) {
-        head->setData(data);
-        head = head->getNext();
-        tail = tail->getNext();
+    void append(T element) {
+        data[headIndex] = element;
+        if (headIndex == 0) {
+            data[size] = element;
+        }
+        tailIndex = headIndex;
+        headIndex = (headIndex + 1) % size;
     }
 
     T last() const {
-        return tail->getData();
+        return data[tailIndex];
     }
 
     unsigned int length() const {
         return size;
     }
 
-//    T &operator[] (int index) {
-//        if (index < 0 || index >= size) {
-//            throw std::out_of_range("Error: index is out of range");
-//        }
-
-//        ListNode<T> *curNode = head;
-//        for (int i = 0; i < index; ++i) {
-//            curNode = curNode->getNext();
-//        }
-//        return curNode->getData();
-//    }
-
     T operator[] (unsigned int index) const {
         if (index >= size) {
             throw std::out_of_range("Error: index is out of range");
         }
 
-        ListNode<T> *curNode = head;
-        for (int i = 0; i < index; ++i) {
-            curNode = curNode->getNext();
-        }
-        return curNode->getData();
+        return data[index];
+    }
+
+    T *getData() const {
+        return data;
+    }
+
+    unsigned int index() const {
+        return headIndex;
     }
 
 private:
-    ListNode<T> *head;
-    ListNode<T> *tail;
+    T *data;
+    unsigned int headIndex;
+    unsigned int tailIndex;
     unsigned int size;
 
 };

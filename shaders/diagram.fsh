@@ -1,6 +1,6 @@
 #version 330 core
 
-varying float vHeight;
+in float vHeight;
 
 vec3 color(float height) {
     float red = height > 0.0 ? 1.0 : height + 1.0;

@@ -1,7 +1,7 @@
 #include "../headers/workercore.h"
 
 WorkerCore::WorkerCore(int core, unsigned int listSize) : core(core) {
-    cpuLoadValues = new CircularList<float>(listSize);
+    cpuLoadValues = new CircularList<float>(listSize, -1.0);
     stat = readStat(core + 1);
 }
 

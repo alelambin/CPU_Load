@@ -1,7 +1,7 @@
 #include "../headers/workercpu.h"
 
 WorkerCPU::WorkerCPU(unsigned int listSize) {
-    cpuLoadValues = new CircularList<float>(listSize);
+    cpuLoadValues = new CircularList<float>(listSize, -1.0);
     stat = readStat(0);
 }
 

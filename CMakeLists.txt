@@ -20,9 +20,9 @@ set(CODE sources/main.cpp
     headers/worker.h
     headers/workercpu.h sources/workercpu.cpp
     sources/workercore.cpp headers/workercore.h
-    headers/circularlist.h headers/listnode.h
+    headers/circularlist.h
     sources/thread.cpp headers/thread.h
-        )
+)
 set(RESOURCES resources.qrc)
 
 add_executable(CPU_Load ${CODE} ${RESOURCES})

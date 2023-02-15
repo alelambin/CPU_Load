@@ -6,7 +6,7 @@ OpenGLWidget::OpenGLWidget(QWidget *parent) : QOpenGLWidget(parent) {
     shaderProgram = new QOpenGLShaderProgram(this);
 
     measuringCount = 60;
-    loadValues = new CircularList<float>(measuringCount);
+    loadValues = new CircularList<float>(measuringCount, -1.0);
     diagram = 0;
 }
 
@@ -43,20 +43,17 @@ void OpenGLWidget::paintGL() {
     glClearColor(backgroundColor.redF(), backgroundColor.greenF(), backgroundColor.blueF(), 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    QVector<float> values(measuringCount);
-    for (unsigned int i = 0; i < measuringCount; ++i) {
-        values[i] = (*loadValues)[i];
-    }
-
     shaderProgram->bind();
 
-    shaderProgram->setUniformValue("uMeasuringCount", measuringCount);
+    shaderProgram->setUniformValue("uStartIndex", loadValues->index());
+    shaderProgram->setUniformValue("uVertexCount", loadValues->length());
 
-    shaderProgram->setAttributeArray("aValue", values.cbegin(), 1, 0);
+    shaderProgram->setAttributeArray("aValue", loadValues->getData(), 1, 0);
     shaderProgram->enableAttributeArray("aValue");
 
     glLineWidth(5);
-    glDrawArrays(GL_LINE_STRIP, 0, values.size());
+    glDrawArrays(GL_LINE_STRIP, loadValues->index(), loadValues->length() - loadValues->index() + 1);
+    glDrawArrays(GL_LINE_STRIP, 0, loadValues->index());
 
     shaderProgram->disableAttributeArray("aValue");
 
