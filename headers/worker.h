@@ -3,7 +3,7 @@
 
 #include <fstream>
 #include <sstream>
-#include "openglwidget.h"
+#include <QObject>
 #include "circularlist.h"
 
 struct CPUStat {
@@ -13,13 +13,10 @@ struct CPUStat {
     unsigned int idle;
 };
 
-class Worker {
-public:
-    struct FunctionParam {
-        Worker *worker;
-        OpenGLWidget *widget;
-    };
+class Worker : public QObject {
+    Q_OBJECT
 
+public:
     virtual ~Worker() = default;
     virtual int id() const = 0;
     virtual CircularList<float> *results() const = 0;
@@ -61,6 +58,9 @@ protected:
 
         return 1.0f - (float) idleDiff / (float) (userDiff + niceDiff + systemDiff + idleDiff);
     }
+
+signals:
+    void newValue(int);
 
 };
 

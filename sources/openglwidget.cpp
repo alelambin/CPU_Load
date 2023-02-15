@@ -1,6 +1,6 @@
 #include "../headers/openglwidget.h"
 
-OpenGLWidget::OpenGLWidget(QWidget *parent) : QOpenGLWidget(parent) {
+OpenGLWidget::OpenGLWidget(unsigned int coreCount, QWidget *parent) : QOpenGLWidget(parent) {
     backgroundColor = QWidget::palette().color(QWidget::backgroundRole());
 
     shaderProgram = new QOpenGLShaderProgram(this);
@@ -8,12 +8,26 @@ OpenGLWidget::OpenGLWidget(QWidget *parent) : QOpenGLWidget(parent) {
     measuringCount = 60;
     loadValues = new CircularList<float>(measuringCount, -1.0);
     diagram = 0;
+
+    Worker *worker = new WorkerCPU();
+    connect(worker, SIGNAL(newValue(int)), this, SLOT(valueReceived(int)));
+    workers.append(worker);
+    threads.append(new Thread(&WorkerCPU::start, &workers.last()));
+    for (int i = 0; i < coreCount; ++i) {
+        worker = new WorkerCore(i);
+        connect(worker, SIGNAL(newValue(int)), this, SLOT(valueReceived(int)));
+        workers.append(worker);
+        threads.append(new Thread(&WorkerCore::start, &workers.last()));
+    }
 }
 
-void OpenGLWidget::changeValues(int workerID, CircularList<float> *list) {
-    if (diagram == workerID) {
-        loadValues = list;
-        update();
+OpenGLWidget::~OpenGLWidget() {
+    for (auto *thread : threads) {
+        thread->cancel();
+        delete thread;
+    }
+    for (auto &worker : workers) {
+        delete worker;
     }
 }
 
@@ -45,6 +59,8 @@ void OpenGLWidget::paintGL() {
 
     shaderProgram->bind();
 
+    loadValues = workers[diagram]->results();
+
     shaderProgram->setUniformValue("uStartIndex", loadValues->index());
     shaderProgram->setUniformValue("uVertexCount", loadValues->length());
 
@@ -65,9 +81,11 @@ void OpenGLWidget::diagramChanged(unsigned int diagramID) {
     update();
 }
 
-void OpenGLWidget::addedValue(CircularList<float> *result) {
-    loadValues = result;
-    update();
+void OpenGLWidget::valueReceived(int workerID) {
+    if (diagram == workerID) {
+        emit(change(loadValues->last()));
+        update();
+    }
 }
 
 void OpenGLWidget::logErrors(QOpenGLShaderProgram *shaderProgram, QString type) {

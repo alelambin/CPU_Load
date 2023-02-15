@@ -9,22 +9,29 @@
 #include <QVBoxLayout>
 #include <QVector>
 #include "circularlist.h"
+#include "workercpu.h"
+#include "workercore.h"
+#include "thread.h"
 
 class OpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions {
     Q_OBJECT
 
 public:
-    OpenGLWidget(QWidget *parent = nullptr);
-    void changeValues(int coreNum, CircularList<float> *);
+    OpenGLWidget(unsigned int coreCount, QWidget *parent = nullptr);
+    ~OpenGLWidget();
+    void changeValues(int coreNum, CircularList<float> *list);
 
 protected:
     virtual void initializeGL() override;
     virtual void resizeGL(int width, int height) override;
     virtual void paintGL() override;
 
+signals:
+    void change(float);
+
 public slots:
-    void diagramChanged(unsigned int);
-    void addedValue(CircularList<float> *);
+    void diagramChanged(unsigned int diagramID);
+    void valueReceived(int workerID);
 
 private:
     void logErrors(QOpenGLShaderProgram *shaderProgram, QString type);
@@ -34,6 +41,8 @@ private:
     CircularList<float> *loadValues;
     unsigned int measuringCount;
     unsigned int diagram;
+    QVector<Thread *> threads;
+    QVector<Worker *> workers;
 
 };
 

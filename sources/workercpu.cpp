@@ -22,12 +22,10 @@ void WorkerCPU::run() {
 }
 
 void *WorkerCPU::start(void *data) {
-    auto *param = (Worker::FunctionParam *) data;
-    Worker *worker = param->worker;
-    OpenGLWidget *widget = param->widget;
+    Worker *worker = *((Worker **) data);
     while (true) {
         worker->run();
-        widget->changeValues(worker->id(), worker->results());
+        emit(worker->newValue(worker->id()));
         sleep(1);
     }
 }

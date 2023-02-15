@@ -23,8 +23,17 @@ SelectWidget::SelectWidget(unsigned int cores, QWidget *parent) : QWidget(parent
     scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     scrollArea->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
 
+    cpuLoadInfo = new QLabel(this);
+    cpuLoadInfo->setText("0.0%");
+    QFont font;
+    font.setPointSize(16);
+    cpuLoadInfo->setFont(font);
+    cpuLoadInfo->setAlignment(Qt::AlignHCenter);
+
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(scrollArea);
+    layout->addWidget(cpuLoadInfo);
+
     setLayout(layout);
 
     for (unsigned int i = 0; i < cores + 1; ++i) {
@@ -35,4 +44,8 @@ SelectWidget::SelectWidget(unsigned int cores, QWidget *parent) : QWidget(parent
             emit change(i);
         });
     }
+}
+void SelectWidget::changedValue(float value) {
+    QString string = QString("%1%").arg( value * 100, 0, 'f', 2);
+    cpuLoadInfo->setText(string);
 }

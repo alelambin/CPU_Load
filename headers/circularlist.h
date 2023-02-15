@@ -2,6 +2,7 @@
 #define CIRCULARLIST_H
 
 #include <stdexcept>
+#include "mutex.h"
 
 template<typename T>
 class CircularList {
@@ -12,9 +13,11 @@ public:
         }
 
         data = new T[size + 1];
+        mutex.lock();
         for (int i = 0; i < size + 1; ++i) {
             data[i] = initData;
         }
+        mutex.unlock();
         headIndex = 0;
         tailIndex = size - 1;
     }
@@ -24,28 +27,36 @@ public:
     }
 
     void append(T element) {
+        mutex.lock();
         data[headIndex] = element;
         if (headIndex == 0) {
             data[size] = element;
         }
+        mutex.unlock();
         tailIndex = headIndex;
         headIndex = (headIndex + 1) % size;
     }
 
-    T last() const {
-        return data[tailIndex];
+    T last() {
+        mutex.lock();
+        T result = data[tailIndex];
+        mutex.unlock();
+        return result;
     }
 
     unsigned int length() const {
         return size;
     }
 
-    T operator[] (unsigned int index) const {
+    T operator[] (unsigned int index) {
         if (index >= size) {
             throw std::out_of_range("Error: index is out of range");
         }
 
-        return data[index];
+        mutex.lock();
+        T result = data[index];
+        mutex.unlock();
+        return result;
     }
 
     T *getData() const {
@@ -61,6 +72,7 @@ private:
     unsigned int headIndex;
     unsigned int tailIndex;
     unsigned int size;
+    Mutex mutex;
 
 };
 

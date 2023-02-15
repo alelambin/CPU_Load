@@ -2,6 +2,7 @@
 #define SELECTWIDGET_H
 
 #include <QWidget>
+#include <QLabel>
 #include <QPushButton>
 #include <QButtonGroup>
 #include <QScrollArea>
@@ -17,8 +18,12 @@ public:
 signals:
     void change(unsigned int);
 
+public slots:
+    void changedValue(float);
+
 private:
     QVector<QPushButton *> buttons;
+    QLabel *cpuLoadInfo;
     int curButtonID;
 
 };

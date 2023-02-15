@@ -22,6 +22,7 @@ set(CODE sources/main.cpp
     sources/workercore.cpp headers/workercore.h
     headers/circularlist.h
     sources/thread.cpp headers/thread.h
+    sources/mutex.cpp headers/mutex.h
 )
 set(RESOURCES resources.qrc)
 
