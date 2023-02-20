@@ -13,20 +13,29 @@ find_package(Qt5 COMPONENTS
     REQUIRED
 )
 
-set(CODE sources/main.cpp
-    headers/mainwidget.h sources/mainwidget.cpp
-    headers/selectwidget.h sources/selectwidget.cpp
-    headers/openglwidget.h sources/openglwidget.cpp
+set(SOURCES sources/main.cpp
+    sources/mainwidget.cpp
+    sources/selectwidget.cpp
+    sources/openglwidget.cpp
+    sources/workercpu.cpp
+    sources/workercore.cpp
+    sources/thread.cpp
+    sources/mutex.cpp
+)
+set(HEADERS
+    headers/mainwidget.h
+    headers/selectwidget.h
+    headers/openglwidget.h
     headers/worker.h
-    headers/workercpu.h sources/workercpu.cpp
-    sources/workercore.cpp headers/workercore.h
+    headers/workercpu.h
+    headers/workercore.h
     headers/circularlist.h
-    sources/thread.cpp headers/thread.h
-    sources/mutex.cpp headers/mutex.h
+    headers/thread.h
+    headers/mutex.h
 )
 set(RESOURCES resources.qrc)
 
-add_executable(CPU_Load ${CODE} ${RESOURCES})
+add_executable(CPU_Load ${SOURCES} ${HEADERS} ${RESOURCES})
 target_link_libraries(CPU_Load
     Qt5::Core
     Qt5::Gui
